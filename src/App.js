@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import Register from "./component/Register";
+import Login from "./component/Login";
+import Dashboard from "./pages/Dashboard";
+import Playable from "./component/playables";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { useState } from "react";
 
-function App() {
+const AuthRoute = ({ user }) => {
+  return user ? <Outlet user={user} /> : <Navigate to="/login" />;
+};
+
+export default function App() {
+  const [user, setUser] = useState({});
+
+  onAuthStateChanged(auth, setUser);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route exact path="/" element={<AuthRoute user={user} />}>
+        <Route exact path="/" element={<Dashboard />} />
+      </Route>
+      <Route exact path="/login" element={<Login />} />
+      <Route exact path="/register" element={<Register />} />
+      <Route exact path="/playable" element={<Playable />} />
+    </Routes>
   );
 }
-
-export default App;
